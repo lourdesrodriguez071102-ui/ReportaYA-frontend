@@ -7,72 +7,76 @@ import DetalleReporte from "./pages/DetalleReporte";
 import NuevoReporte from "./pages/NuevoReporte";
 import Estadisticas from "./pages/Estadisticas";
 import NoEncontrada from "./pages/NoEncontrada";
-import { REPORTES } from "./data/reportes";
+import useReportes from "./hooks/useReportes";
 import { leerGuardado, guardar } from "./utils/almacenamiento";
 
-// Componente principal: guarda los datos que comparten todas las páginas
-// y define las rutas. Cada página recibe por props lo que necesita.
+// Componente principal.
+// - Los reportes llegan de la API (hook useReportes: Axios + useEffect).
+// - Lo que hace este vecino (reportes nuevos, apoyos y cambios de estado)
+//   se guarda aparte en el navegador y se combina con los datos de la API.
 
 function App() {
-  // ESTADO 1: la lista de reportes.
-  // Cambia cuando se publica un reporte, cuando alguien lo apoya
-  // o cuando el municipio le cambia el estado.
-  // Arranca con lo guardado en el navegador (o con los de ejemplo).
-  const [reportes, setReportes] = useState(() => leerGuardado("reportaya-reportes", REPORTES));
+  // Datos de la API, estado de carga y error
+  const { reportes: reportesApi, cargando, error, reintentar } = useReportes();
 
-  // ESTADO 2: los ids de los reportes que este vecino ya apoyó.
-  // Sirve para que cada persona pueda apoyar un reporte una sola vez.
+  // ESTADO: reportes que publicó este vecino (todavía no están en la API)
+  const [nuevos, setNuevos] = useState(() => leerGuardado("reportaya-nuevos", []));
+
+  // ESTADO: cambios sobre los reportes, por id. Ej: { 3: { apoyos: 5, estado: "resuelto" } }
+  const [cambios, setCambios] = useState(() => leerGuardado("reportaya-cambios", {}));
+
+  // ESTADO: ids de los reportes que este vecino ya apoyó
   const [apoyados, setApoyados] = useState(() => leerGuardado("reportaya-apoyados", []));
 
-  // EFECTO 1: cada vez que cambia la lista de reportes, se guarda en el navegador.
-  // Dependencia [reportes]: solo se ejecuta cuando la lista cambia.
-  useEffect(() => {
-    guardar("reportaya-reportes", reportes);
-  }, [reportes]);
+  // EFECTOS: cada vez que cambia uno de estos datos, se guarda en el navegador
+  useEffect(() => guardar("reportaya-nuevos", nuevos), [nuevos]);
+  useEffect(() => guardar("reportaya-cambios", cambios), [cambios]);
+  useEffect(() => guardar("reportaya-apoyados", apoyados), [apoyados]);
 
-  // EFECTO 2: lo mismo con los apoyos de este vecino.
-  useEffect(() => {
-    guardar("reportaya-apoyados", apoyados);
-  }, [apoyados]);
+  // Lista final: reportes nuevos + los de la API, con los cambios aplicados
+  const reportes = [...nuevos, ...reportesApi].map((reporte) => ({
+    ...reporte,
+    ...cambios[reporte.id],
+  }));
 
   function agregarReporte(nuevoReporte) {
-    setReportes([nuevoReporte, ...reportes]);
+    setNuevos([nuevoReporte, ...nuevos]);
   }
 
-  // Suma un apoyo ("Me pasa también") al reporte, si este vecino no lo apoyó antes
+  // Guarda un cambio sobre un reporte (sin perder los cambios anteriores)
+  function registrarCambio(id, cambio) {
+    setCambios({ ...cambios, [id]: { ...cambios[id], ...cambio } });
+  }
+
+  // Suma un apoyo ("Me pasa también"), una sola vez por vecino
   function apoyarReporte(id) {
     if (apoyados.includes(id)) return;
-
-    setReportes(
-      reportes.map((reporte) =>
-        reporte.id === id ? { ...reporte, apoyos: (reporte.apoyos ?? 0) + 1 } : reporte
-      )
-    );
+    const reporte = reportes.find((item) => item.id === id);
+    registrarCambio(id, { apoyos: (reporte.apoyos ?? 0) + 1 });
     setApoyados([...apoyados, id]);
   }
 
-  // Cambia el estado de un reporte (lo usa el panel del municipio)
+  // Cambia el estado de un reporte (panel del municipio)
   function cambiarEstado(id, estadoNuevo) {
-    setReportes(
-      reportes.map((reporte) => (reporte.id === id ? { ...reporte, estado: estadoNuevo } : reporte))
-    );
+    registrarCambio(id, { estado: estadoNuevo });
   }
 
-  // Props que necesitan las tarjetas para el botón "Me pasa también"
+  // Props que comparten varias páginas
+  const carga = { cargando, error, alReintentar: reintentar };
   const apoyo = { apoyados, alApoyar: apoyarReporte };
 
   return (
     <Routes>
       {/* Layout envuelve a todas las páginas: encabezado + página + pie */}
       <Route element={<Layout />}>
-        <Route path="/" element={<Inicio reportes={reportes} {...apoyo} />} />
-        <Route path="/reportes" element={<Reportes reportes={reportes} {...apoyo} />} />
+        <Route path="/" element={<Inicio reportes={reportes} {...carga} {...apoyo} />} />
+        <Route path="/reportes" element={<Reportes reportes={reportes} {...carga} {...apoyo} />} />
         <Route
           path="/reportes/:id"
-          element={<DetalleReporte reportes={reportes} {...apoyo} alCambiarEstado={cambiarEstado} />}
+          element={<DetalleReporte reportes={reportes} {...carga} {...apoyo} alCambiarEstado={cambiarEstado} />}
         />
         <Route path="/nuevo-reporte" element={<NuevoReporte alCrear={agregarReporte} />} />
-        <Route path="/estadisticas" element={<Estadisticas reportes={reportes} />} />
+        <Route path="/estadisticas" element={<Estadisticas reportes={reportes} {...carga} />} />
         <Route path="*" element={<NoEncontrada />} />
       </Route>
     </Routes>

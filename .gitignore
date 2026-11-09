@@ -10,3 +10,8 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 *.log
+
+# Variables de entorno (no se suben a GitHub)
+.env
+.env.local
+.env.*.local
