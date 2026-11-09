@@ -10,7 +10,7 @@ ReportaYa es un sistema web para que los vecinos reporten problemas del espacio 
 
 Repositorio N.º 2 (frontend) de **Programación IV**: migración del proyecto anterior a **React + Vite** con **React Bootstrap**.
 
-🔗 **Sitio publicado:** https://TU-PROYECTO-REACT.vercel.app/
+🔗 **Sitio publicado:** https://reporta-ya-frontend.vercel.app/
 
 ## Tecnologías
 
