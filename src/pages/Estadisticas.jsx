@@ -1,4 +1,5 @@
-import { Container, Row, Col, ProgressBar, ListGroup } from "react-bootstrap";
+import { Container, Row, Col, ProgressBar, ListGroup, Badge } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import Seo from "../components/comunes/Seo";
 import EncabezadoPagina from "../components/comunes/EncabezadoPagina";
 import ContadorAnimado from "../components/comunes/ContadorAnimado";
@@ -35,6 +36,9 @@ function Estadisticas({ reportes }) {
     cantidad: contarPor("categoria", clave),
   }));
   const maximo = Math.max(1, ...porCategoria.map((categoria) => categoria.cantidad));
+
+  // Los 3 reportes con más apoyos (se ordena una copia para no cambiar la lista original)
+  const masApoyados = [...reportes].sort((a, b) => (b.apoyos ?? 0) - (a.apoyos ?? 0)).slice(0, 3);
 
   return (
     <>
@@ -110,6 +114,28 @@ function Estadisticas({ reportes }) {
                   />
                 </div>
               ))}
+            </section>
+          </Col>
+
+          {/* Ranking de apoyos: ayuda al municipio a decidir qué atender primero */}
+          <Col xs={12}>
+            <section aria-labelledby="mas-apoyados">
+              <h2 id="mas-apoyados" className="h5 fw-bold text-primary mb-3">
+                Los más apoyados por los vecinos
+              </h2>
+              <ListGroup as="ol" numbered className="shadow-sm">
+                {masApoyados.map((reporte) => (
+                  <ListGroup.Item as="li" key={reporte.id} className="d-flex justify-content-between align-items-center gap-3">
+                    <Link to={`/reportes/${reporte.id}`} className="me-auto fw-semibold text-primary text-decoration-none">
+                      {reporte.titulo}
+                    </Link>
+                    <Badge bg="primary" pill>
+                      <i className="bi bi-hand-thumbs-up-fill me-1" aria-hidden="true"></i>
+                      {reporte.apoyos ?? 0}
+                    </Badge>
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
             </section>
           </Col>
         </Row>

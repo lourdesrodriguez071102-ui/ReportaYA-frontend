@@ -19,7 +19,11 @@ Repositorio N.º 2 (frontend) de **Programación IV**.
 - **Detalle de cada reporte** con su ilustración, ubicación en el mapa y seguimiento del estado.
 - **Nuevo reporte** con validación y vista previa en vivo. Al publicarlo se abre su página de detalle.
 - **Estadísticas** calculadas a partir de los reportes, con barras por estado y por categoría.
-- Los reportes nuevos se **guardan en el navegador** (localStorage) y no se pierden al recargar.
+- **"Me pasa también":** cada vecino puede apoyar un reporte una vez; los apoyos muestran a cuánta gente afecta el problema.
+- **Panel del municipio** (simulado) en el detalle, para cambiar el estado de un reporte.
+- **Borrador automático** del formulario: si salís de la página, lo escrito no se pierde.
+- **Ordenar el listado** por más recientes, más antiguos o más apoyados, y ranking de los más apoyados en estadísticas.
+- Los reportes, los apoyos y el borrador se **guardan en el navegador** (localStorage) y no se pierden al recargar.
 - Página **404** para direcciones que no existen.
 
 ## Tecnologías
@@ -73,12 +77,12 @@ Cómo se usa React Router en el proyecto:
 │   │   ├── layout/      → Layout, Encabezado, PieDePagina
 │   │   ├── inicio/      → Hero, PasoTarjeta, CategoriaTarjeta
 │   │   ├── reportes/    → TarjetaReporte, FiltrosReportes, SelectOpciones, BadgeEstado,
-│   │   │                  CartelCalle, SeguimientoEstado, Ilustracion
+│   │   │                  CartelCalle, SeguimientoEstado, Ilustracion, BotonApoyo, PanelMunicipio
 │   │   └── mapa/        → MapaBarrio, PinMapa
 │   ├── pages/           → Inicio, Reportes, DetalleReporte, NuevoReporte, Estadisticas, NoEncontrada
 │   ├── data/            → reportes.js (categorías, barrios, estados y reportes de ejemplo)
 │   ├── hooks/           → useEnPantalla.js
-│   ├── utils/           → formato.js (fechas y búsqueda)
+│   ├── utils/           → formato.js (fechas y búsqueda) y almacenamiento.js (localStorage)
 │   ├── App.jsx          → estado de los reportes y rutas
 │   ├── main.jsx         → punto de entrada (BrowserRouter + Bootstrap)
 │   └── index.css        → variables globales
@@ -102,6 +106,8 @@ Cómo se usa React Router en el proyecto:
 | `PinMapa` | `reporte`, `indice` | Un pin por reporte |
 | `FiltrosReportes` | `filtros`, `alCambiar` | Reportes |
 | `SelectOpciones` | `nombre`, `opciones`, `textoVacio`, `valor`, `alCambiar`, `requerido` | Filtros y formulario (5 selects) |
+| `BotonApoyo` | `cantidad`, `yaApoyado`, `alApoyar`, `tamano` | Tarjetas y detalle |
+| `PanelMunicipio` | `estado`, `alCambiar` | Detalle |
 | `BadgeEstado` | `estado` | Tarjetas y detalle |
 | `CartelCalle` | `direccion` | Tarjetas y detalle |
 | `SeguimientoEstado` | `estado` | Tarjetas y detalle |
@@ -110,7 +116,44 @@ Cómo se usa React Router en el proyecto:
 | `PasoTarjeta` | `numero`, `icono`, `titulo`, `texto` | Inicio (3 veces) |
 | `PieDePagina` | `autora` | Layout |
 
-**Cómo viajan los datos:** `App` guarda la lista de reportes con `useState` y se la pasa por props a cada página. `NuevoReporte` recibe la función `alCrear`: así el formulario le avisa a `App` que hay un reporte nuevo, y todas las páginas se actualizan.
+**Cómo viajan los datos:** `App` guarda la lista de reportes con `useState` y se la pasa por props a cada página. Las páginas reciben también funciones (`alCrear`, `alApoyar`, `alCambiarEstado`): así un componente hijo le avisa a `App` que algo cambió, y todas las páginas se actualizan.
+
+## Hooks: `useState` y `useEffect`
+
+- **`useState`** guarda un dato que puede cambiar. Cuando cambia, React vuelve a dibujar el componente con el valor nuevo. Se usa así: `const [valor, setValor] = useState(valorInicial)`.
+- **`useEffect`** ejecuta una acción *después* de dibujar el componente: al cargarlo y/o cuando cambian sus **dependencias** (la lista `[...]` del final).
+  - `[]` vacía: se ejecuta una sola vez, al cargar el componente.
+  - `[dato]`: se ejecuta al cargar y cada vez que `dato` cambia.
+  - Si devuelve una función, esa es la **limpieza**: se ejecuta antes de repetir el efecto o cuando el componente desaparece.
+
+### Estados (`useState`)
+
+| Dónde | Qué estado maneja | Cuándo y por qué cambia | Por qué con `useState` |
+|-------|-------------------|-------------------------|------------------------|
+| `App` | `reportes`: la lista de reportes | Al publicar un reporte, al apoyarlo o cuando el municipio cambia su estado | La comparten todas las páginas; al cambiar, el mapa, el listado y las estadísticas se actualizan solos |
+| `App` | `apoyados`: ids que este vecino ya apoyó | Al tocar "Me pasa también" | Para que cada vecino apoye un reporte una sola vez |
+| `Reportes` | `busqueda`, `barrio`, `estado` (filtros) | Con cada letra o cada opción elegida | El listado se recalcula al instante según lo que se elige |
+| `Reportes` | `orden` del listado | Al elegir otra opción en "Ordenar por" | Cambia el orden de las tarjetas sin recargar |
+| `NuevoReporte` | `datos`: lo escrito en el formulario | Con cada letra o selección | Alimenta la vista previa en vivo y el borrador |
+| `NuevoReporte` | `validado` | Al intentar publicar con campos incompletos | Muestra los errores solo después del primer intento |
+| `DetalleReporte` | `mostrarAviso` | Empieza en `true` si venimos del formulario; pasa a `false` al cerrarlo | Muestra el aviso "Reporte publicado" una sola vez |
+| `PanelMunicipio` | `mensaje` de confirmación | Al cambiar el estado; vuelve a vacío a los 3 segundos | Confirma el cambio y desaparece solo |
+| `ContadorAnimado` | `actual`: el número que se ve | Varias veces por segundo durante la animación | Para que el número "cuente" de 0 al total |
+| `useEnPantalla` | `visible` | Cuando el elemento entra en pantalla | Activa animaciones (barras y contador) recién cuando se ven |
+
+### Efectos (`useEffect`)
+
+| Dónde | Para qué | Cuándo se ejecuta | Dependencias |
+|-------|----------|-------------------|--------------|
+| `App` | Guardar los reportes en el navegador | Al cargar y cada vez que cambia la lista | `[reportes]`: solo guarda si la lista cambió |
+| `App` | Guardar los apoyos del vecino | Al cargar y cada vez que apoya un reporte | `[apoyados]` |
+| `NuevoReporte` | Guardar el **borrador** del formulario (o borrarlo si está vacío) | Cada vez que cambia lo escrito | `[datos, hayBorrador]`: no se repite en cada dibujado, solo si el formulario cambió |
+| `PanelMunicipio` | Borrar el mensaje a los 3 segundos | Cada vez que aparece un mensaje nuevo | `[mensaje]`. La **limpieza** (`clearTimeout`) cancela el temporizador anterior si llega otro mensaje o se sale de la página |
+| `DetalleReporte` | Quitar la marca "nuevo" del historial, para que el aviso no reaparezca al recargar | Al cargar el detalle y al cambiar la ubicación | `[location, navigate]` |
+| `Seo` | Cambiar el título de la pestaña y los metadatos | Al entrar a cada página | `[titulo, descripcion, ruta]`: se actualiza si se pasa a otro reporte |
+| `Layout` | Volver al principio de la página al navegar | Cada vez que cambia la ruta | `[pathname]` |
+| `useEnPantalla` | Observar cuándo un elemento aparece en pantalla | Una vez, al cargar | `[]`. La limpieza deja de observar si el componente desaparece |
+| `ContadorAnimado` | Animar el número | Cuando el contador se vuelve visible | `[visible, valor, duracion]` |
 
 ## Uso de `map()`
 

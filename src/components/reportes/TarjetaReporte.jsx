@@ -4,6 +4,7 @@ import Ilustracion from "./Ilustracion";
 import BadgeEstado from "./BadgeEstado";
 import CartelCalle from "./CartelCalle";
 import SeguimientoEstado from "./SeguimientoEstado";
+import BotonApoyo from "./BotonApoyo";
 import { CATEGORIAS, BARRIOS } from "../../data/reportes";
 import { formatearFecha } from "../../utils/formato";
 
@@ -12,9 +13,11 @@ import { formatearFecha } from "../../utils/formato";
 // Props:
 //   - reporte: objeto con los datos del reporte
 //   - esVistaPrevia: true cuando se muestra mientras se completa el formulario
+//   - apoyados: ids de los reportes que este vecino ya apoyó
+//   - alApoyar: función que suma un apoyo (recibe el id del reporte)
 
-function TarjetaReporte({ reporte, esVistaPrevia = false }) {
-  const { id, titulo, descripcion, categoria, barrio, direccion, estado, fecha } = reporte;
+function TarjetaReporte({ reporte, esVistaPrevia = false, apoyados = [], alApoyar }) {
+  const { id, titulo, descripcion, categoria, barrio, direccion, estado, fecha, apoyos } = reporte;
   const datosCategoria = CATEGORIAS[categoria] || CATEGORIAS.otro;
 
   return (
@@ -58,8 +61,17 @@ function TarjetaReporte({ reporte, esVistaPrevia = false }) {
         </div>
       </Card.Body>
 
-      <Card.Footer className="bg-transparent border-0 pt-0 pb-3">
+      <Card.Footer className="bg-transparent border-0 pt-0 pb-3 d-flex flex-column gap-3">
         <SeguimientoEstado estado={estado} />
+        {/* En la vista previa no se puede apoyar: el reporte todavía no existe */}
+        {!esVistaPrevia && alApoyar && (
+          <BotonApoyo
+            cantidad={apoyos}
+            yaApoyado={apoyados.includes(id)}
+            alApoyar={() => alApoyar(id)}
+            tamano="sm"
+          />
+        )}
       </Card.Footer>
     </Card>
   );

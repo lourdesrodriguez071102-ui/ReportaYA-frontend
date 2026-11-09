@@ -7,6 +7,8 @@ import Ilustracion from "../components/reportes/Ilustracion";
 import BadgeEstado from "../components/reportes/BadgeEstado";
 import CartelCalle from "../components/reportes/CartelCalle";
 import SeguimientoEstado from "../components/reportes/SeguimientoEstado";
+import BotonApoyo from "../components/reportes/BotonApoyo";
+import PanelMunicipio from "../components/reportes/PanelMunicipio";
 import MapaBarrio from "../components/mapa/MapaBarrio";
 import NoEncontrada from "./NoEncontrada";
 import { CATEGORIAS, BARRIOS } from "../data/reportes";
@@ -16,16 +18,20 @@ import { formatearFecha } from "../utils/formato";
 // useParams lee el ":id" de la dirección; con él buscamos el reporte.
 // Props:
 //   - reportes: lista completa de reportes (viene desde App)
+//   - apoyados, alApoyar: para el botón "Me pasa también"
+//   - alCambiarEstado: función del panel del municipio (recibe id y estado nuevo)
 
-function DetalleReporte({ reportes }) {
+function DetalleReporte({ reportes, apoyados, alApoyar, alCambiarEstado }) {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Si venimos del formulario, mostramos un aviso de "publicado"
+  // ESTADO: si se muestra el aviso de "publicado".
+  // Arranca en true solo si venimos del formulario; cambia a false al cerrarlo.
   const [mostrarAviso, setMostrarAviso] = useState(location.state?.nuevo === true);
 
-  // Borramos esa marca del historial: así el aviso no vuelve a salir al recargar
+  // EFECTO: borra la marca "nuevo" del historial, así el aviso no vuelve
+  // a salir al recargar. Se ejecuta al cargar la página y cuando cambia la ubicación.
   useEffect(() => {
     if (location.state?.nuevo) {
       navigate(location.pathname, { replace: true });
@@ -45,6 +51,7 @@ function DetalleReporte({ reportes }) {
     { etiqueta: "Categoría", valor: categoria.nombre, icono: categoria.icono },
     { etiqueta: "Barrio", valor: BARRIOS[reporte.barrio], icono: "bi-geo-alt" },
     { etiqueta: "Fecha", valor: formatearFecha(reporte.fecha), icono: "bi-calendar3" },
+    { etiqueta: "Vecinos afectados", valor: reporte.apoyos ?? 0, icono: "bi-people" },
   ];
 
   return (
@@ -90,6 +97,12 @@ function DetalleReporte({ reportes }) {
                 <h2 className="h5 fw-bold text-primary">Qué pasa</h2>
                 <p className="fs-5">{reporte.descripcion}</p>
 
+                <BotonApoyo
+                  cantidad={reporte.apoyos}
+                  yaApoyado={apoyados.includes(reporte.id)}
+                  alApoyar={() => alApoyar(reporte.id)}
+                />
+
                 <h2 className="h5 fw-bold text-primary mt-4">Seguimiento</h2>
                 <SeguimientoEstado estado={reporte.estado} />
               </Card.Body>
@@ -111,6 +124,13 @@ function DetalleReporte({ reportes }) {
                 </div>
               ))}
             </dl>
+
+            <div className="mb-4">
+              <PanelMunicipio
+                estado={reporte.estado}
+                alCambiar={(estadoNuevo) => alCambiarEstado(reporte.id, estadoNuevo)}
+              />
+            </div>
 
             <div className="d-grid gap-2">
               <Button as={Link} to="/reportes" variant="outline-primary">Ver todos los reportes</Button>

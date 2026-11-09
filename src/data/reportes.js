@@ -80,6 +80,7 @@ export const CALLES_MAPA = [
 
 // Reportes de ejemplo.
 // x / y: ubicación del pin en el mapa ilustrado (dibujo de 640 x 480).
+// apoyos: cuántos vecinos marcaron "Me pasa también".
 export const REPORTES = [
   {
     id: 1,
@@ -90,6 +91,7 @@ export const REPORTES = [
     direccion: "San Martín 450",
     estado: "pendiente",
     fecha: "2026-10-20",
+    apoyos: 12,
     x: 200,
     y: 110,
   },
@@ -102,6 +104,7 @@ export const REPORTES = [
     direccion: "Av. Mate de Luna 1800",
     estado: "en-proceso",
     fecha: "2026-10-15",
+    apoyos: 7,
     x: 470,
     y: 240,
   },
@@ -114,6 +117,7 @@ export const REPORTES = [
     direccion: "Lavalle 2300",
     estado: "resuelto",
     fecha: "2026-10-02",
+    apoyos: 4,
     x: 320,
     y: 370,
   },
