@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Container, Row, Col, Form, InputGroup, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import Seo from "../components/comunes/Seo";
@@ -7,8 +7,10 @@ import SelectOpciones from "../components/reportes/SelectOpciones";
 import TarjetaReporte from "../components/reportes/TarjetaReporte";
 import { CATEGORIAS, BARRIOS, CALLES_MAPA } from "../data/reportes";
 import { fechaDeHoy } from "../utils/formato";
+import { leerGuardado, guardar, borrarGuardado } from "../utils/almacenamiento";
 
 const FORMULARIO_VACIO = { titulo: "", categoria: "", barrio: "", direccion: "", descripcion: "" };
+const CLAVE_BORRADOR = "reportaya-borrador";
 
 // Campos de texto del formulario: se dibujan con map()
 const CAMPOS_TEXTO = [
@@ -29,8 +31,29 @@ function ubicarEnMapa() {
 
 function NuevoReporte({ alCrear }) {
   const navigate = useNavigate();
-  const [datos, setDatos] = useState(FORMULARIO_VACIO);
+
+  // ESTADO 1: lo que la persona escribe en el formulario.
+  // Cambia con cada letra o cada opción elegida. Arranca con el borrador
+  // guardado (si quedó uno de antes) o vacío.
+  const [datos, setDatos] = useState(() => leerGuardado(CLAVE_BORRADOR, FORMULARIO_VACIO));
+
+  // ESTADO 2: si hay que mostrar los errores de validación.
+  // Pasa a true cuando se intenta publicar con campos incompletos.
   const [validado, setValidado] = useState(false);
+
+  // ¿Escribió algo? (alcanza con que un campo tenga contenido)
+  const hayBorrador = Object.values(datos).some((valor) => valor !== "");
+
+  // EFECTO: guarda el borrador cada vez que cambian los datos.
+  // Dependencia [datos, hayBorrador]: se ejecuta solo cuando el formulario cambia,
+  // no en cada dibujado. Si la persona sale de la página, no pierde lo escrito.
+  useEffect(() => {
+    if (hayBorrador) {
+      guardar(CLAVE_BORRADOR, datos);
+    } else {
+      borrarGuardado(CLAVE_BORRADOR);
+    }
+  }, [datos, hayBorrador]);
 
   function actualizarCampo(nombre, valor) {
     setDatos({ ...datos, [nombre]: valor });
@@ -52,11 +75,13 @@ function NuevoReporte({ alCrear }) {
       direccion: datos.direccion.trim(),
       id: Date.now(),
       estado: "pendiente",
+      apoyos: 0,
       fecha: fechaDeHoy(),
       ...ubicarEnMapa(),
     };
 
     alCrear(nuevo);
+    borrarGuardado(CLAVE_BORRADOR); // ya se publicó: el borrador no hace falta
 
     // Lleva a la página del reporte nuevo y le avisa que recién se creó
     navigate(`/reportes/${nuevo.id}`, { state: { nuevo: true } });
@@ -159,6 +184,27 @@ function NuevoReporte({ alCrear }) {
                   />
                   <Form.Control.Feedback type="invalid">Contá el problema en al menos 10 letras.</Form.Control.Feedback>
                 </Form.Group>
+
+                {/* Aviso del borrador: aparece solo si hay algo escrito */}
+                {hayBorrador && (
+                  <Col xs={12} className="d-flex flex-wrap justify-content-between align-items-center gap-2 small">
+                    <span className="text-success fw-semibold">
+                      <i className="bi bi-cloud-check me-1" aria-hidden="true"></i>
+                      Borrador guardado en este navegador
+                    </span>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      className="text-secondary p-0"
+                      onClick={() => {
+                        setDatos(FORMULARIO_VACIO);
+                        setValidado(false);
+                      }}
+                    >
+                      Descartar borrador
+                    </Button>
+                  </Col>
+                )}
 
                 <Col xs={12}>
                   <Button type="submit" variant="acento" size="lg" className="w-100 fw-bold">
