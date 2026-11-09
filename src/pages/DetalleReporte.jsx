@@ -11,6 +11,7 @@ import BotonApoyo from "../components/reportes/BotonApoyo";
 import PanelMunicipio from "../components/reportes/PanelMunicipio";
 import MapaBarrio from "../components/mapa/MapaBarrio";
 import NoEncontrada from "./NoEncontrada";
+import EstadoCarga from "../components/comunes/EstadoCarga";
 import { CATEGORIAS, BARRIOS } from "../data/reportes";
 import { formatearFecha } from "../utils/formato";
 
@@ -20,8 +21,9 @@ import { formatearFecha } from "../utils/formato";
 //   - reportes: lista completa de reportes (viene desde App)
 //   - apoyados, alApoyar: para el botón "Me pasa también"
 //   - alCambiarEstado: función del panel del municipio (recibe id y estado nuevo)
+//   - cargando, error, alReintentar: estado de la petición a la API
 
-function DetalleReporte({ reportes, apoyados, alApoyar, alCambiarEstado }) {
+function DetalleReporte({ reportes, apoyados, alApoyar, alCambiarEstado, cargando, error, alReintentar }) {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -37,6 +39,15 @@ function DetalleReporte({ reportes, apoyados, alApoyar, alCambiarEstado }) {
       navigate(location.pathname, { replace: true });
     }
   }, [location, navigate]);
+
+  // Mientras llegan los datos de la API (o si falló), todavía no sabemos si el reporte existe
+  if (cargando || error) {
+    return (
+      <Container className="py-5">
+        <EstadoCarga cargando={cargando} error={error} alReintentar={alReintentar} />
+      </Container>
+    );
+  }
 
   const reporte = reportes.find((item) => String(item.id) === id);
 
