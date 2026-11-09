@@ -12,8 +12,9 @@ import { CATEGORIAS, PASOS } from "../data/reportes";
 // Página de inicio (ruta "/").
 // Props:
 //   - reportes: lista de reportes (viene desde App)
+//   - apoyados, alApoyar: para el botón "Me pasa también" de las tarjetas
 
-function Inicio({ reportes }) {
+function Inicio({ reportes, apoyados, alApoyar }) {
   const ultimos = reportes.slice(0, 3); // los 3 más recientes
 
   return (
@@ -67,7 +68,7 @@ function Inicio({ reportes }) {
           <Row xs={1} md={2} lg={3} className="g-4">
             {ultimos.map((reporte) => (
               <Col key={reporte.id}>
-                <TarjetaReporte reporte={reporte} />
+                <TarjetaReporte reporte={reporte} apoyados={apoyados} alApoyar={alApoyar} />
               </Col>
             ))}
           </Row>
