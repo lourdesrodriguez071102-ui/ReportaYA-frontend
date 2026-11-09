@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import useEnPantalla from "../hooks/useEnPantalla";
+import useEnPantalla from "../../hooks/useEnPantalla";
 
 // Componente reutilizable: un número que "cuenta" desde 0 hasta su valor
 // cuando aparece en la pantalla.

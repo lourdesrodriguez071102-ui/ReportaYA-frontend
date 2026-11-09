@@ -8,142 +8,148 @@
 
 ReportaYa es un sistema web para que los vecinos reporten problemas del espacio público de su barrio (baches, luminarias rotas, basurales, pérdidas de agua) y sigan en qué estado está cada reclamo: pendiente, en proceso o resuelto.
 
-Repositorio N.º 2 (frontend) de **Programación IV**: migración del proyecto anterior a **React + Vite** con **React Bootstrap**.
+Repositorio N.º 2 (frontend) de **Programación IV**.
 
 🔗 **Sitio publicado:** https://reporta-ya-frontend.vercel.app/
 
+## Funcionalidades
+
+- **Mapa del barrio** en el inicio: cada reporte es un pin del color de su estado. Al pasar el mouse muestra un resumen y al tocarlo abre el detalle.
+- **Listado de reportes** con búsqueda por título o calle y filtros por categoría, barrio y estado.
+- **Detalle de cada reporte** con su ilustración, ubicación en el mapa y seguimiento del estado.
+- **Nuevo reporte** con validación y vista previa en vivo. Al publicarlo se abre su página de detalle.
+- **Estadísticas** calculadas a partir de los reportes, con barras por estado y por categoría.
+- Los reportes nuevos se **guardan en el navegador** (localStorage) y no se pierden al recargar.
+- Página **404** para direcciones que no existen.
+
 ## Tecnologías
 
-- React y Vite
-- React Bootstrap y Bootstrap
+- React 19 y Vite
+- React Router (navegación entre páginas)
+- React Bootstrap y Bootstrap 5
 - Bootstrap Icons
 - JavaScript
 - Git, GitHub y Vercel
 
-## Cómo ejecutar el proyecto
+## Instalación y ejecución
 
 Requisito: tener instalado [Node.js](https://nodejs.org/).
 
 ```bash
-npm install     # instala las dependencias (solo la primera vez)
-npm run dev     # abre el servidor de desarrollo en http://localhost:5173
+git clone https://github.com/lourdesrodriguez071102-ui/ReportaYA-frontend.git
+cd ReportaYA-frontend
+npm install     # instala las dependencias
+npm run dev     # abre el sitio en http://localhost:5173
 npm run build   # genera la versión de producción en la carpeta dist
 ```
 
-## Identidad visual: "señalética urbana"
+## Páginas y rutas (React Router)
 
-La interfaz toma su estética de la calle: el asfalto, los conos, la pintura vial y los carteles con nombres de calles.
+| Ruta | Página | Qué muestra |
+|------|--------|-------------|
+| `/` | `Inicio` | Mapa del barrio, cómo funciona, categorías y últimos reportes |
+| `/reportes` | `Reportes` | Listado con filtros. Acepta `?categoria=bache` para llegar ya filtrado |
+| `/reportes/:id` | `DetalleReporte` | Un reporte. El `:id` se lee con `useParams` |
+| `/nuevo-reporte` | `NuevoReporte` | Formulario con vista previa |
+| `/estadisticas` | `Estadisticas` | Totales por estado y por categoría |
+| `*` | `NoEncontrada` | Página 404 |
 
-| Elemento | Decisión |
-|----------|----------|
-| Tipografía | **Overpass**, inspirada en la letra de los carteles de ruta. Una sola familia: muy gruesa en títulos, liviana en textos |
-| Colores | Asfalto `#2B2F36`, azul cartel `#1E3A5F`, naranja cono `#F26B1D`, amarillo vial `#F5C400`, gris tiza `#F3F5F7` |
-| Estados | Rojo (pendiente), ámbar (en proceso) y verde (resuelto), como un semáforo |
-| Portada | Un **mapa ilustrado del barrio** donde cada reporte es un pin del color de su estado |
-| Imágenes | **Ilustraciones SVG propias** para cada categoría, hechas con código y con los colores de la marca |
-| Direcciones | Se muestran como **carteles de calle** (azul con borde blanco) |
+Cómo se usa React Router en el proyecto:
 
-### Movimiento
-
-- **Al cargar:** los pines caen sobre el mapa uno después del otro y se pinta la línea amarilla de la avenida. Los reportes pendientes "laten".
-- **Al hacer scroll:** en computadora, a la izquierda hay una **calle con paradas** (una por sección). Un pin baja a medida que se recorre la página y se marca la sección actual. En celular, se reemplaza por una barra de progreso con línea punteada.
-- **Estadísticas:** el número total cuenta desde 0 y las barras crecen cuando la sección aparece.
-- Si el sistema tiene activada la opción de **reducir movimiento**, las animaciones se desactivan.
-
-## Funcionalidades
-
-- **Mapa interactivo:** al pasar el mouse (o con el teclado) sobre un pin se ve el detalle; al tocarlo, baja hasta la tarjeta del reporte.
-- **Categorías:** al tocar una, el listado se filtra por esa categoría.
-- **Filtros combinados:** búsqueda por título o calle, categoría, barrio y estado, con contador de resultados y mensaje cuando no hay coincidencias.
-- **Nuevo reporte con vista previa en vivo:** mientras se completa el formulario, la tarjeta se arma al lado. Al publicarlo aparece en el mapa, en el listado y en las estadísticas.
-- **Validación** con los estilos de React Bootstrap.
+- `BrowserRouter` (en `main.jsx`) habilita la navegación.
+- `Routes` y `Route` (en `App.jsx`) definen qué página corresponde a cada ruta.
+- `Layout` usa `<Outlet />` para dibujar la página actual entre el encabezado y el pie.
+- `NavLink` en el menú marca la página activa; `Link` navega sin recargar la página.
+- `useParams` lee el id del reporte, `useSearchParams` lee la categoría de la dirección, `useNavigate` lleva al detalle después de publicar y vuelve atrás con el botón "Volver".
+- `vercel.json` hace que Vercel sirva la app en cualquier ruta (si no, recargar en `/reportes` daría error 404).
 
 ## Estructura de carpetas
 
 ```
-├── public/
-│   ├── img/logo.svg
-│   ├── robots.txt
-│   └── sitemap.xml
+├── public/              → logo, robots.txt y sitemap.xml
 ├── src/
-│   ├── components/          → piezas reutilizables
-│   │   ├── BadgeEstado.jsx
-│   │   ├── CartelCalle.jsx
-│   │   ├── ContadorAnimado.jsx
-│   │   ├── Ilustracion.jsx
-│   │   ├── MapaBarrio.jsx
-│   │   ├── PinMapa.jsx
-│   │   ├── Recorrido.jsx
-│   │   ├── SeguimientoEstado.jsx
-│   │   ├── SelectOpciones.jsx
-│   │   ├── TarjetaReporte.jsx
-│   │   └── TituloSeccion.jsx
-│   ├── hooks/
-│   │   └── useEnPantalla.js → avisa cuándo un elemento aparece en pantalla
-│   ├── sections/            → secciones de la página
-│   │   ├── Encabezado.jsx
-│   │   ├── Hero.jsx
-│   │   ├── ComoFunciona.jsx
-│   │   ├── Categorias.jsx
-│   │   ├── Reportes.jsx
-│   │   ├── Estadisticas.jsx
-│   │   ├── NuevoReporte.jsx
-│   │   └── PieDePagina.jsx
-│   ├── data/reportes.js     → datos del sistema
-│   ├── App.jsx              → componente principal (guarda el estado compartido)
-│   ├── main.jsx             → punto de entrada
-│   └── index.css            → estilos de la marca
-├── index.html               → HTML base con el SEO
-├── package.json
-└── vite.config.js
+│   ├── components/
+│   │   ├── comunes/     → Seo, EncabezadoPagina, TituloSeccion, Calle, ContadorAnimado
+│   │   ├── layout/      → Layout, Encabezado, PieDePagina
+│   │   ├── inicio/      → Hero, PasoTarjeta, CategoriaTarjeta
+│   │   ├── reportes/    → TarjetaReporte, FiltrosReportes, SelectOpciones, BadgeEstado,
+│   │   │                  CartelCalle, SeguimientoEstado, Ilustracion
+│   │   └── mapa/        → MapaBarrio, PinMapa
+│   ├── pages/           → Inicio, Reportes, DetalleReporte, NuevoReporte, Estadisticas, NoEncontrada
+│   ├── data/            → reportes.js (categorías, barrios, estados y reportes de ejemplo)
+│   ├── hooks/           → useEnPantalla.js
+│   ├── utils/           → formato.js (fechas y búsqueda)
+│   ├── App.jsx          → estado de los reportes y rutas
+│   ├── main.jsx         → punto de entrada (BrowserRouter + Bootstrap)
+│   └── index.css        → variables globales
+├── index.html
+├── vercel.json
+└── package.json
 ```
+
+- **pages:** una vista completa por ruta.
+- **components:** piezas reutilizables, agrupadas por tema.
 
 ## Componentes y props
 
-### Componentes reutilizables
+| Componente | Props | Se reutiliza en |
+|------------|-------|-----------------|
+| `Seo` | `titulo`, `descripcion`, `ruta` | Las 6 páginas |
+| `EncabezadoPagina` | `titulo`, `bajada`, `children` | Reportes, Detalle, Nuevo reporte, Estadísticas |
+| `TituloSeccion` | `id`, `titulo`, `bajada`, `claro` | Las 3 secciones del inicio |
+| `TarjetaReporte` | `reporte`, `esVistaPrevia` | Inicio, Reportes y vista previa del formulario |
+| `MapaBarrio` | `reportes` | Inicio (todos los reportes) y Detalle (un reporte) |
+| `PinMapa` | `reporte`, `indice` | Un pin por reporte |
+| `FiltrosReportes` | `filtros`, `alCambiar` | Reportes |
+| `SelectOpciones` | `nombre`, `opciones`, `textoVacio`, `valor`, `alCambiar`, `requerido` | Filtros y formulario (5 selects) |
+| `BadgeEstado` | `estado` | Tarjetas y detalle |
+| `CartelCalle` | `direccion` | Tarjetas y detalle |
+| `SeguimientoEstado` | `estado` | Tarjetas y detalle |
+| `Ilustracion` | `tipo`, `className` | Categorías, tarjetas, detalle y 404 |
+| `CategoriaTarjeta` | `clave`, `nombre`, `descripcion`, `cantidad` | Inicio (5 veces) |
+| `PasoTarjeta` | `numero`, `icono`, `titulo`, `texto` | Inicio (3 veces) |
+| `PieDePagina` | `autora` | Layout |
 
-| Componente | Props | Dónde se usa |
-|------------|-------|--------------|
-| `TituloSeccion` | `id`, `titulo`, `bajada`, `claro` | En las 5 secciones con título |
-| `Ilustracion` | `tipo`, `className` | Categorías y tarjetas de reportes |
-| `TarjetaReporte` | `reporte`, `esVistaPrevia` | Listado **y** vista previa del formulario |
-| `BadgeEstado` | `estado` | Dentro de cada tarjeta |
-| `SeguimientoEstado` | `estado` | Barra de 3 etapas en cada tarjeta |
-| `CartelCalle` | `direccion` | Dirección de cada tarjeta |
-| `MapaBarrio` | `reportes` | Portada |
-| `PinMapa` | `reporte`, `indice` | Un pin por reporte en el mapa |
-| `SelectOpciones` | `nombre`, `opciones`, `textoVacio`, `valor`, `alCambiar`, `requerido` | 6 selects (filtros y formulario) |
-| `ContadorAnimado` | `valor`, `duracion` | Total de estadísticas |
-| `Recorrido` | `secciones` | Calle lateral y barra de progreso |
+**Cómo viajan los datos:** `App` guarda la lista de reportes con `useState` y se la pasa por props a cada página. `NuevoReporte` recibe la función `alCrear`: así el formulario le avisa a `App` que hay un reporte nuevo, y todas las páginas se actualizan.
 
-### Cómo viajan los datos
+## Uso de `map()`
 
-`App` guarda el **estado compartido** (`useState`) y lo pasa por **props**:
+`map()` recorre una lista y devuelve un elemento por cada ítem, sin repetir código. Se usa para:
 
-```
-App  (estado: reportes, categoria)
- ├─ reportes ─────────────────► Hero ──► MapaBarrio ──► PinMapa (x cada reporte)
- ├─ pasos ────────────────────► ComoFunciona
- ├─ reportes, alElegir ───────► Categorias ──► Ilustracion
- ├─ reportes, categoria,
- │  alCambiarCategoria ───────► Reportes ──► TarjetaReporte ──► BadgeEstado, CartelCalle, SeguimientoEstado
- ├─ reportes ─────────────────► Estadisticas ──► ContadorAnimado
- └─ alCrear ──────────────────► NuevoReporte ──► TarjetaReporte (vista previa)
-```
+- Los enlaces del menú y del pie de página.
+- Los pines del mapa, las manzanas y las calles del dibujo.
+- Las tarjetas de reportes, categorías y pasos.
+- Las opciones de los selects y los selects de los filtros.
+- Los campos de texto del formulario.
+- Las barras y listas de las estadísticas y los datos del detalle.
 
-- Las props `alElegir`, `alCambiarCategoria` y `alCrear` son **funciones**: permiten que un hijo le avise algo al padre (por ejemplo, que se creó un reporte).
-- Cuando cambia el estado en `App`, React vuelve a dibujar todas las secciones que lo usan: por eso un reporte nuevo aparece a la vez en el mapa, el listado y las estadísticas.
+Cada elemento creado con `map()` lleva una `key` única para que React lo identifique.
 
-## SEO
+## Estrategias de SEO
 
-En `index.html`: idioma, título y meta description, meta robots, URL canónica, Open Graph, datos estructurados (JSON-LD), color de tema, un solo `h1` y `robots.txt` y `sitemap.xml` en `public/`. Las secciones usan etiquetas semánticas (`header`, `nav`, `main`, `section`, `article`, `footer`, `figure`).
+| Estrategia | Dónde |
+|------------|-------|
+| Título y descripción **distintos en cada página** | Componente `Seo`, usado en todas las páginas |
+| URL canónica y Open Graph actualizados por página | Componente `Seo` |
+| Un solo `h1` por página | `Hero` en el inicio y `EncabezadoPagina` en el resto |
+| Etiquetas semánticas | `header`, `nav`, `main`, `section`, `article`, `figure`, `footer`, `dl` |
+| Metadatos base, JSON-LD, idioma y color de tema | `index.html` |
+| `alt` y `aria-label` en imágenes y pines | Componentes del mapa e ilustraciones |
+| `robots.txt` y `sitemap.xml` con todas las rutas | `public/` |
+| Direcciones claras y legibles | `/reportes`, `/reportes/2`, `/nuevo-reporte` |
 
-## Accesibilidad
+## Estilos: Bootstrap primero
 
-- Foco visible al navegar con teclado.
-- Los pines del mapa son enlaces con descripción (`aria-label`).
-- Mensajes de resultados con `aria-live`.
-- Respeta la preferencia de reducir movimiento.
+El diseño se arma con componentes de React Bootstrap (`Navbar`, `Card`, `Badge`, `Form`, `ProgressBar`, `ListGroup`, `Tooltip`, `Alert`) y con utilidades de Bootstrap (`d-flex`, `gap-*`, `py-*`, `ratio`, `position-absolute`, `rounded-*`, `shadow-*`, `text-*`, `bg-*`, etc.).
+
+`index.css` tiene **74 líneas**, cerca del **5%** del código de la interfaz. Solo contiene:
+
+- **Variables globales** de la marca y la paleta aplicada a Bootstrap (`--bs-primary`, `--bs-warning`, etc.), así `bg-primary` o `btn-primary` usan los colores de ReportaYa.
+- Unas pocas piezas de identidad que Bootstrap no trae: la franja de asfalto (`.calle`), el fondo de plano, el botón naranja y la animación de los pines.
+
+## Identidad visual
+
+Inspirada en la señalética urbana: azul cartel `#1E3A5F`, naranja cono `#F26B1D`, amarillo vial `#F5C400` y asfalto `#2B2F36`, con la tipografía **Overpass** (basada en los carteles de ruta) e ilustraciones SVG propias para cada categoría.
 
 ## Organización de ramas
 
