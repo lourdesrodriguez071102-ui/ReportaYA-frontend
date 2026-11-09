@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Pin de ubicación con un signo de exclamación: "acá hay un problema" -->
+  <path d="M32 4C20.4 4 11 13.4 11 25c0 15.8 21 35 21 35s21-19.2 21-35C53 13.4 43.6 4 32 4z" fill="#F26B1D"/>
+  <circle cx="32" cy="25" r="13" fill="#ffffff"/>
+  <rect x="29.5" y="16" width="5" height="12" rx="2.5" fill="#1e3a5f"/>
+  <circle cx="32" cy="33" r="2.8" fill="#1e3a5f"/>
+</svg>
