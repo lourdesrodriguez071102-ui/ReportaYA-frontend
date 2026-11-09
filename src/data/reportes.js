@@ -40,11 +40,12 @@ export const BARRIOS = {
   "villa-lujan": "Villa Luján",
 };
 
-// Estados en orden: el reporte avanza de 0 (pendiente) a 2 (resuelto)
+// Estados en orden: el reporte avanza de 0 (pendiente) a 2 (resuelto).
+// "variante" es el color de Bootstrap que usa cada estado.
 export const ESTADOS = {
-  "pendiente": { nombre: "Pendiente", orden: 0, color: "rojo" },
-  "en-proceso": { nombre: "En proceso", orden: 1, color: "ambar" },
-  "resuelto": { nombre: "Resuelto", orden: 2, color: "verde" },
+  "pendiente": { nombre: "Pendiente", orden: 0, variante: "danger" },
+  "en-proceso": { nombre: "En proceso", orden: 1, variante: "warning" },
+  "resuelto": { nombre: "Resuelto", orden: 2, variante: "success" },
 };
 
 // Pasos de "¿Cómo funciona?" (es una secuencia, por eso van numerados)
@@ -89,7 +90,7 @@ export const REPORTES = [
     direccion: "San Martín 450",
     estado: "pendiente",
     fecha: "2026-10-20",
-    x: 180,
+    x: 200,
     y: 110,
   },
   {
