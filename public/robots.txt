@@ -3,4 +3,4 @@ User-agent: *
 Allow: /
 
 # Ubicación del mapa del sitio (reemplazar por la URL real)
-Sitemap: https://TU-PROYECTO-REACT.vercel.app/sitemap.xml
+Sitemap: https://reporta-ya-frontend.vercel.app/sitemap.xml
