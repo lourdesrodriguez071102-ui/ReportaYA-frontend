@@ -1,58 +1,57 @@
-import { useState } from "react";
-import Encabezado from "./sections/Encabezado";
-import Hero from "./sections/Hero";
-import ComoFunciona from "./sections/ComoFunciona";
-import Categorias from "./sections/Categorias";
-import Reportes from "./sections/Reportes";
-import Estadisticas from "./sections/Estadisticas";
-import NuevoReporte from "./sections/NuevoReporte";
-import PieDePagina from "./sections/PieDePagina";
-import Recorrido from "./components/Recorrido";
-import { PASOS, REPORTES } from "./data/reportes";
+import { useEffect, useState } from "react";
+import { Routes, Route } from "react-router-dom";
+import Layout from "./components/layout/Layout";
+import Inicio from "./pages/Inicio";
+import Reportes from "./pages/Reportes";
+import DetalleReporte from "./pages/DetalleReporte";
+import NuevoReporte from "./pages/NuevoReporte";
+import Estadisticas from "./pages/Estadisticas";
+import NoEncontrada from "./pages/NoEncontrada";
+import { REPORTES } from "./data/reportes";
 
-// Paradas del recorrido lateral (una por sección)
-const SECCIONES = [
-  { id: "inicio", texto: "Mapa", icono: "bi-map" },
-  { id: "como-funciona", texto: "Cómo funciona", icono: "bi-signpost-2" },
-  { id: "categorias", texto: "Categorías", icono: "bi-grid-3x2-gap" },
-  { id: "reportes", texto: "Reportes", icono: "bi-pin-map" },
-  { id: "estadisticas", texto: "Estadísticas", icono: "bi-bar-chart-line" },
-  { id: "nuevo-reporte", texto: "Nuevo reporte", icono: "bi-plus-lg" },
-];
+const CLAVE_GUARDADO = "reportaya-reportes";
 
-// Componente principal.
-// Guarda los datos que comparten varias secciones (estado) y se los
-// pasa por props. Cuando cambian, todas las secciones se actualizan.
+// Lee los reportes guardados en el navegador; si no hay, usa los de ejemplo
+function cargarReportes() {
+  try {
+    const guardados = localStorage.getItem(CLAVE_GUARDADO);
+    return guardados ? JSON.parse(guardados) : REPORTES;
+  } catch {
+    return REPORTES;
+  }
+}
+
+// Componente principal: guarda la lista de reportes (estado compartido)
+// y define las rutas. Cada página recibe por props lo que necesita.
 
 function App() {
-  // Lista de reportes: la usan el mapa, el listado, las categorías y las estadísticas
-  const [reportes, setReportes] = useState(REPORTES);
+  const [reportes, setReportes] = useState(cargarReportes);
 
-  // Categoría elegida: la cambian tanto Categorías como el filtro del listado
-  const [categoria, setCategoria] = useState("");
+  // Cada vez que cambia la lista, se guarda en el navegador
+  useEffect(() => {
+    try {
+      localStorage.setItem(CLAVE_GUARDADO, JSON.stringify(reportes));
+    } catch {
+      // Si el navegador no permite guardar, la app sigue funcionando igual
+    }
+  }, [reportes]);
 
-  // Se ejecuta cuando el formulario crea un reporte nuevo
   function agregarReporte(nuevoReporte) {
     setReportes([nuevoReporte, ...reportes]);
-    setCategoria("");
   }
 
   return (
-    <>
-      <Encabezado />
-      <Recorrido secciones={SECCIONES} />
-
-      <main>
-        <Hero reportes={reportes} />
-        <ComoFunciona pasos={PASOS} />
-        <Categorias reportes={reportes} alElegir={setCategoria} />
-        <Reportes reportes={reportes} categoria={categoria} alCambiarCategoria={setCategoria} />
-        <Estadisticas reportes={reportes} />
-        <NuevoReporte alCrear={agregarReporte} />
-      </main>
-
-      <PieDePagina autora="Lourdes" />
-    </>
+    <Routes>
+      {/* Layout envuelve a todas las páginas: encabezado + página + pie */}
+      <Route element={<Layout />}>
+        <Route path="/" element={<Inicio reportes={reportes} />} />
+        <Route path="/reportes" element={<Reportes reportes={reportes} />} />
+        <Route path="/reportes/:id" element={<DetalleReporte reportes={reportes} />} />
+        <Route path="/nuevo-reporte" element={<NuevoReporte alCrear={agregarReporte} />} />
+        <Route path="/estadisticas" element={<Estadisticas reportes={reportes} />} />
+        <Route path="*" element={<NoEncontrada />} />
+      </Route>
+    </Routes>
   );
 }
 
