@@ -7,14 +7,16 @@ import Hero from "../components/inicio/Hero";
 import PasoTarjeta from "../components/inicio/PasoTarjeta";
 import CategoriaTarjeta from "../components/inicio/CategoriaTarjeta";
 import TarjetaReporte from "../components/reportes/TarjetaReporte";
+import EstadoCarga from "../components/comunes/EstadoCarga";
 import { CATEGORIAS, PASOS } from "../data/reportes";
 
 // Página de inicio (ruta "/").
 // Props:
 //   - reportes: lista de reportes (viene desde App)
 //   - apoyados, alApoyar: para el botón "Me pasa también" de las tarjetas
+//   - cargando, error, alReintentar: estado de la petición a la API
 
-function Inicio({ reportes, apoyados, alApoyar }) {
+function Inicio({ reportes, apoyados, alApoyar, cargando, error, alReintentar }) {
   const ultimos = reportes.slice(0, 3); // los 3 más recientes
 
   return (
@@ -65,13 +67,15 @@ function Inicio({ reportes, apoyados, alApoyar }) {
       <section className="py-5" aria-labelledby="ultimos">
         <Container className="py-lg-3">
           <TituloSeccion id="ultimos" titulo="Últimos reportes" bajada="Lo más reciente que cargaron los vecinos." />
-          <Row xs={1} md={2} lg={3} className="g-4">
-            {ultimos.map((reporte) => (
-              <Col key={reporte.id}>
-                <TarjetaReporte reporte={reporte} apoyados={apoyados} alApoyar={alApoyar} />
-              </Col>
-            ))}
-          </Row>
+          <EstadoCarga cargando={cargando} error={error} alReintentar={alReintentar}>
+            <Row xs={1} md={2} lg={3} className="g-4">
+              {ultimos.map((reporte) => (
+                <Col key={reporte.id}>
+                  <TarjetaReporte reporte={reporte} apoyados={apoyados} alApoyar={alApoyar} />
+                </Col>
+              ))}
+            </Row>
+          </EstadoCarga>
           <div className="text-center mt-4">
             <Button as={Link} to="/reportes" variant="outline-primary" size="lg" className="fw-bold">
               Ver todos los reportes
