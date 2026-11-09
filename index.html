@@ -1,0 +1,57 @@
+<!doctype html>
+<!-- SEO: idioma de la página -->
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- SEO: título y descripción -->
+    <title>ReportaYa | Reportá baches, luminarias y basurales de tu barrio</title>
+    <meta name="description" content="ReportaYa es una plataforma para que los vecinos reporten problemas urbanos como baches, luminarias rotas y basurales, y sigan el estado de cada reporte." />
+    <meta name="keywords" content="reportes urbanos, baches, luminarias, basurales, reclamos municipales, barrio" />
+    <meta name="author" content="Lourdes" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- SEO: URL canónica (reemplazar por la URL de Vercel de este repositorio) -->
+    <link rel="canonical" href="https://TU-PROYECTO-REACT.vercel.app/" />
+
+    <!-- SEO: Open Graph, para compartir en redes y WhatsApp -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="ReportaYa | Reportes urbanos" />
+    <meta property="og:description" content="Reportá los problemas de tu barrio y seguí su estado." />
+    <meta property="og:image" content="/img/logo.svg" />
+    <meta property="og:url" content="https://TU-PROYECTO-REACT.vercel.app/" />
+    <meta property="og:locale" content="es_AR" />
+
+    <!-- SEO: datos estructurados (JSON-LD) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "ReportaYa",
+        "url": "https://TU-PROYECTO-REACT.vercel.app/",
+        "description": "Plataforma para que los vecinos reporten problemas urbanos y sigan el estado de cada reporte.",
+        "inLanguage": "es-AR"
+      }
+    </script>
+
+    <link rel="icon" type="image/svg+xml" href="/img/logo.svg" />
+    <meta name="theme-color" content="#1E3A5F" />
+
+    <!-- Tipografías de Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <!-- Bootstrap Icons (los estilos de Bootstrap se importan en src/main.jsx) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  </head>
+  <body>
+    <!-- React dibuja toda la aplicación dentro de este div -->
+    <div id="root"></div>
+
+    <noscript>Para usar ReportaYa necesitás activar JavaScript en tu navegador.</noscript>
+
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

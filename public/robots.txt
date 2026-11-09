@@ -1,0 +1,6 @@
+# Permite a todos los buscadores recorrer el sitio
+User-agent: *
+Allow: /
+
+# Ubicación del mapa del sitio (reemplazar por la URL real)
+Sitemap: https://TU-PROYECTO-REACT.vercel.app/sitemap.xml
