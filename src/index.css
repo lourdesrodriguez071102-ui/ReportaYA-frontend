@@ -1,0 +1,1273 @@
+/* =========================================================
+   ReportaYa - Estilos propios
+   Identidad: "señalética urbana". Colores del asfalto, de los conos
+   y de la pintura vial; tipografía Overpass, inspirada en los
+   carteles de ruta.
+
+   Índice:
+   1. Variables
+   2. Base y tipografía
+   3. Botones
+   4. Barra de navegación
+   5. Recorrido (scroll) y barra de progreso
+   6. Secciones y títulos
+   7. Portada y mapa
+   8. Cómo funciona
+   9. Categorías
+   10. Filtros y tarjetas de reportes
+   11. Estadísticas
+   12. Formulario y vista previa
+   13. Pie de página
+   14. Responsive
+   15. Movimiento reducido
+   ========================================================= */
+
+
+/* ===== 1. VARIABLES ===== */
+:root {
+  /* Paleta */
+  --asfalto: #2B2F36;
+  --asfalto-claro: #3A3F48;
+  --azul: #1E3A5F;
+  --naranja: #F26B1D;
+  --naranja-oscuro: #D4560E;
+  --amarillo: #F5C400;
+  --tiza: #F3F5F7;
+  --linea: #DCE1E7;
+  --texto: #22262C;
+  --texto-suave: #5A6472;
+
+  /* Estados */
+  --rojo: #E2483D;
+  --ambar: #F5A400;
+  --verde: #2F9E6B;
+
+  /* Tipografía */
+  --fuente: "Overpass", "Segoe UI", Arial, sans-serif;
+
+  /* Escala tipográfica (proporción 1.25) */
+  --t-chico: 0.875rem;
+  --t-base: 1rem;
+  --t-m: 1.25rem;
+  --t-l: 1.563rem;
+  --t-xl: 1.953rem;
+  --t-xxl: 2.441rem;
+
+  /* Bordes: chicos en señales, medianos en tarjetas */
+  --radio-senal: 6px;
+  --radio-tarjeta: 14px;
+
+  /* Bootstrap usa nuestras variables */
+  --bs-body-font-family: var(--fuente);
+  --bs-body-color: var(--texto);
+  --bs-body-bg: #FFFFFF;
+  --bs-border-color: var(--linea);
+}
+
+
+/* ===== 2. BASE Y TIPOGRAFÍA ===== */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 72px;  /* la barra fija no tapa los títulos */
+}
+
+body {
+  font-size: var(--t-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--fuente);
+  color: var(--azul);
+  line-height: 1.1;
+}
+
+p {
+  max-width: 68ch;  /* líneas de lectura cómodas */
+}
+
+/* Foco visible para quien navega con teclado */
+a:focus-visible,
+button:focus-visible,
+.form-control:focus-visible,
+.form-select:focus-visible {
+  outline: 3px solid var(--amarillo);
+  outline-offset: 2px;
+}
+
+.bi {
+  line-height: 1;
+}
+
+
+/* ===== 3. BOTONES =====
+   <Button variant="acento"> genera la clase "btn-acento" */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  border-radius: var(--radio-senal);
+}
+
+.btn-acento {
+  --bs-btn-color: #FFFFFF;
+  --bs-btn-bg: var(--naranja);
+  --bs-btn-border-color: var(--naranja);
+  --bs-btn-hover-color: #FFFFFF;
+  --bs-btn-hover-bg: var(--naranja-oscuro);
+  --bs-btn-hover-border-color: var(--naranja-oscuro);
+  --bs-btn-active-color: #FFFFFF;
+  --bs-btn-active-bg: var(--naranja-oscuro);
+  --bs-btn-active-border-color: var(--naranja-oscuro);
+}
+
+.btn-outline-marca {
+  --bs-btn-color: var(--azul);
+  --bs-btn-border-color: var(--azul);
+  --bs-btn-hover-color: #FFFFFF;
+  --bs-btn-hover-bg: var(--azul);
+  --bs-btn-hover-border-color: var(--azul);
+  --bs-btn-active-color: #FFFFFF;
+  --bs-btn-active-bg: var(--azul);
+  border-width: 2px;
+}
+
+
+/* ===== 4. BARRA DE NAVEGACIÓN ===== */
+.barra {
+  background-color: var(--azul);
+  padding: 0.6rem 0;
+  box-shadow: 0 2px 0 var(--amarillo);  /* línea amarilla como demarcación */
+}
+
+.barra__marca {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 900;
+  font-size: var(--t-m);
+  letter-spacing: -0.01em;
+}
+
+.barra__enlace {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  padding: 0.5rem 0.85rem !important;
+  border-radius: var(--radio-senal);
+}
+
+.barra__enlace .bi {
+  color: var(--amarillo);
+  font-size: 1.05rem;
+}
+
+.barra__enlace:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.barra__boton {
+  margin-left: 0.75rem;
+}
+
+
+/* ===== 5. RECORRIDO (SCROLL) Y BARRA DE PROGRESO ===== */
+
+/* Barra fina de progreso (celular y tablet) */
+.progreso {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1040;
+  height: 4px;
+  background: repeating-linear-gradient(90deg, var(--amarillo) 0 18px, transparent 18px 26px);
+  transform-origin: left;
+}
+
+/* Calle lateral (solo computadoras grandes) */
+.recorrido {
+  display: none;
+  position: fixed;
+  left: 28px;
+  top: 50%;
+  z-index: 1020;
+  height: 56vh;
+  transform: translateY(-50%);
+}
+
+.recorrido__calle {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 12px;
+  border-radius: 6px;
+  background-color: var(--asfalto);
+  /* Línea amarilla punteada en el centro */
+  background-image: repeating-linear-gradient(180deg, var(--amarillo) 0 10px, transparent 10px 20px);
+  background-size: 2px 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.recorrido__avance {
+  position: absolute;
+  inset: 0 0 auto 0;
+  border-radius: 6px;
+  background-color: rgba(242, 107, 29, 0.55);
+}
+
+.recorrido__marcador {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -85%);
+  color: var(--naranja);
+  font-size: 1.5rem;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.3));
+}
+
+.recorrido__paradas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.recorrido__paradas li {
+  position: absolute;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.recorrido__parada {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+}
+
+.recorrido__punto {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #FFFFFF;
+  border: 3px solid var(--asfalto);
+}
+
+.recorrido__parada--actual .recorrido__punto {
+  background-color: var(--amarillo);
+}
+
+/* El nombre de la parada aparece al pasar el mouse o con el teclado */
+.recorrido__nombre {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radio-senal);
+  font-size: var(--t-chico);
+  font-weight: 700;
+  white-space: nowrap;
+  color: #FFFFFF;
+  background-color: var(--azul);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+}
+
+.recorrido__parada:hover .recorrido__nombre,
+.recorrido__parada:focus-visible .recorrido__nombre {
+  opacity: 1;
+  transform: none;
+}
+
+
+/* ===== 6. SECCIONES Y TÍTULOS ===== */
+.seccion {
+  padding: 5.5rem 0;
+}
+
+.seccion--tiza {
+  background-color: var(--tiza);
+}
+
+.seccion--asfalto {
+  background-color: var(--asfalto);
+  color: #FFFFFF;
+}
+
+.titulo-seccion {
+  margin-bottom: 2.75rem;
+}
+
+.titulo-seccion__titulo {
+  font-size: clamp(var(--t-xl), 4vw, var(--t-xxl));
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+
+.titulo-seccion__bajada {
+  font-size: var(--t-m);
+  color: var(--texto-suave);
+  margin-bottom: 0;
+}
+
+.titulo-seccion--claro .titulo-seccion__titulo { color: #FFFFFF; }
+.titulo-seccion--claro .titulo-seccion__bajada { color: #B7C0CC; }
+
+
+/* ===== 7. PORTADA Y MAPA ===== */
+.hero {
+  padding: 4.5rem 0 5rem;
+  /* Cuadrícula suave, como un plano */
+  background-color: var(--tiza);
+  background-image:
+    linear-gradient(var(--linea) 1px, transparent 1px),
+    linear-gradient(90deg, var(--linea) 1px, transparent 1px);
+  background-size: 48px 48px;
+  border-bottom: 1px solid var(--linea);
+}
+
+.hero__titulo {
+  font-size: clamp(2.5rem, 5.6vw, 4.25rem);
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+  margin-bottom: 1.5rem;
+  animation: entrar 0.7s ease-out both;
+}
+
+.hero__texto {
+  font-size: var(--t-m);
+  color: var(--texto-suave);
+  margin-bottom: 2rem;
+  animation: entrar 0.7s 0.1s ease-out both;
+}
+
+.hero__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  animation: entrar 0.7s 0.2s ease-out both;
+}
+
+.hero__mapa {
+  margin: 0;
+}
+
+.mapa {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radio-tarjeta);
+  overflow: hidden;
+  border: 6px solid #FFFFFF;
+  box-shadow: 0 24px 48px -20px rgba(30, 58, 95, 0.45);
+}
+
+.mapa__plano {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* La línea amarilla de la avenida "avanza" al cargar */
+.mapa__demarcacion {
+  animation: pintar 1.4s ease-out both;
+}
+
+/* Cartel con el nombre de la calle sobre el mapa */
+.mapa__calle {
+  position: absolute;
+  right: 2%;
+  transform: translateY(-50%);
+  padding: 0.1rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  background-color: var(--azul);
+  border: 2px solid #FFFFFF;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px var(--azul);
+}
+
+/* Pines */
+.pin {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  transform: translate(-50%, -100%);
+  text-decoration: none;
+  animation: caer 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.pin__cabeza {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  border: 3px solid #FFFFFF;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+}
+
+.pin__cabeza .bi {
+  transform: rotate(45deg);
+  font-size: 1.05rem;
+  color: #FFFFFF;
+}
+
+.pin--rojo .pin__cabeza  { background-color: var(--rojo); }
+.pin--ambar .pin__cabeza { background-color: var(--ambar); }
+.pin--verde .pin__cabeza { background-color: var(--verde); }
+
+/* Los pendientes "laten" para llamar la atención */
+.pin--rojo::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 26px;
+  height: 10px;
+  margin-left: -13px;
+  border-radius: 50%;
+  border: 2px solid var(--rojo);
+  animation: latido 1.8s ease-out 1.2s infinite;
+}
+
+/* Ficha con el detalle del reporte.
+   --fx mueve la ficha en horizontal según el lado del mapa. */
+.pin__ficha {
+  --fx: -50%;
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  max-width: min(220px, 60vw);
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radio-senal);
+  font-size: var(--t-chico);
+  line-height: 1.3;
+  color: var(--texto-suave);
+  background-color: #FFFFFF;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(var(--fx), 6px);
+  transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+  pointer-events: none;
+}
+
+/* Pines de la mitad de arriba: la ficha se abre hacia abajo */
+.pin--abajo .pin__ficha {
+  bottom: auto;
+  top: calc(100% + 10px);
+}
+
+/* Pines cerca de los bordes: la ficha se alinea hacia adentro */
+.pin--izq .pin__ficha {
+  --fx: -12px;
+  left: 0;
+}
+
+.pin--der .pin__ficha {
+  --fx: 12px;
+  left: auto;
+  right: 0;
+}
+
+.pin__ficha strong {
+  color: var(--azul);
+}
+
+.pin__estado {
+  font-weight: 700;
+  color: var(--texto);
+}
+
+.pin:hover,
+.pin:focus-visible {
+  z-index: 3;
+}
+
+.pin:hover .pin__ficha,
+.pin:focus-visible .pin__ficha {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(var(--fx), 0);
+}
+
+/* Referencias de colores bajo el mapa */
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-top: 1rem;
+  font-size: var(--t-chico);
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+.leyenda__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.leyenda__item::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.leyenda__item strong {
+  color: var(--texto);
+}
+
+.leyenda__item--rojo::before  { background-color: var(--rojo); }
+.leyenda__item--ambar::before { background-color: var(--ambar); }
+.leyenda__item--verde::before { background-color: var(--verde); }
+
+@keyframes entrar {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes caer {
+  from { opacity: 0; transform: translate(-50%, -260%); }
+  to   { opacity: 1; transform: translate(-50%, -100%); }
+}
+
+@keyframes pintar {
+  from { stroke-dashoffset: 640; opacity: 0; }
+  to   { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes latido {
+  from { transform: scale(0.6); opacity: 1; }
+  to   { transform: scale(2.2); opacity: 0; }
+}
+
+
+/* ===== 8. CÓMO FUNCIONA =====
+   Los pasos son paradas sobre una calle con línea amarilla. */
+.pasos {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* La calle que une las paradas */
+.pasos::before {
+  content: "";
+  position: absolute;
+  top: 22px;
+  left: 22px;
+  right: 22px;
+  height: 14px;
+  border-radius: 7px;
+  background-color: var(--asfalto);
+  background-image: repeating-linear-gradient(90deg, var(--amarillo) 0 16px, transparent 16px 30px);
+  background-size: 100% 2px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.paso {
+  position: relative;
+}
+
+.paso__parada {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 58px;
+  height: 58px;
+  margin-bottom: 1.25rem;
+  border-radius: 50%;
+  font-size: var(--t-l);
+  font-weight: 900;
+  color: #FFFFFF;
+  background-color: var(--naranja);
+  border: 5px solid #FFFFFF;
+  box-shadow: 0 0 0 2px var(--naranja);
+}
+
+.paso__titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--t-l);
+  font-weight: 800;
+  margin-bottom: 0.4rem;
+}
+
+.paso__titulo .bi {
+  color: var(--naranja);
+  font-size: 1.2rem;
+}
+
+.paso__texto {
+  color: var(--texto-suave);
+  margin-bottom: 0;
+}
+
+
+/* ===== 9. CATEGORÍAS ===== */
+.categorias {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+}
+
+.categoria {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radio-tarjeta);
+  text-decoration: none;
+  color: inherit;
+  background-color: #FFFFFF;
+  border: 1px solid var(--linea);
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.categoria:hover {
+  border-color: var(--naranja);
+  transform: translateY(-4px);
+}
+
+.categoria__dibujo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 10 / 7;
+}
+
+.categoria__texto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex-grow: 1;
+  padding: 1rem 1.1rem 1.2rem;
+}
+
+.categoria__nombre {
+  font-size: var(--t-m);
+  font-weight: 800;
+  color: var(--azul);
+}
+
+.categoria__descripcion {
+  font-size: var(--t-chico);
+  color: var(--texto-suave);
+  flex-grow: 1;
+}
+
+.categoria__cantidad {
+  font-size: var(--t-chico);
+  font-weight: 700;
+  color: var(--naranja-oscuro);
+}
+
+
+/* ===== 10. FILTROS Y TARJETAS DE REPORTES ===== */
+.filtros {
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  border-radius: var(--radio-tarjeta);
+  background-color: var(--tiza);
+}
+
+.filtros .form-label,
+.formulario .form-label {
+  font-weight: 700;
+  font-size: var(--t-chico);
+}
+
+.form-control,
+.form-select,
+.input-group-text {
+  border-radius: var(--radio-senal);
+  min-height: 46px;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--naranja);
+  box-shadow: 0 0 0 0.2rem rgba(242, 107, 29, 0.2);
+}
+
+.resultados {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.resultados__cantidad {
+  margin: 0;
+  font-weight: 700;
+  color: var(--texto-suave);
+}
+
+.resultados__limpiar {
+  font-weight: 700;
+  color: var(--naranja-oscuro);
+  text-decoration: none;
+}
+
+.vacio {
+  padding: 3.5rem 1rem;
+  text-align: center;
+  border: 2px dashed var(--linea);
+  border-radius: var(--radio-tarjeta);
+}
+
+.vacio .bi {
+  font-size: 2.5rem;
+  color: var(--texto-suave);
+}
+
+.vacio p {
+  margin: 0.75rem auto 1.25rem;
+  font-weight: 600;
+}
+
+/* Tarjeta de reporte */
+.tarjeta-reporte {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--radio-tarjeta);
+  background-color: #FFFFFF;
+  border: 1px solid var(--linea);
+  scroll-margin-top: 90px;
+}
+
+/* Al llegar desde un pin del mapa, la tarjeta se marca */
+.tarjeta-reporte:target {
+  border-color: var(--naranja);
+  box-shadow: 0 0 0 4px rgba(242, 107, 29, 0.25);
+}
+
+.tarjeta-reporte__media {
+  position: relative;
+  aspect-ratio: 16 / 7;
+}
+
+.tarjeta-reporte__media .ilustracion {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tarjeta-reporte__categoria {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radio-senal);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--asfalto);
+  background-color: var(--amarillo);
+}
+
+.tarjeta-reporte__cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex-grow: 1;
+  padding: 1.1rem 1.2rem 1.25rem;
+}
+
+.tarjeta-reporte__fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tarjeta-reporte__fecha {
+  font-size: var(--t-chico);
+  color: var(--texto-suave);
+}
+
+.tarjeta-reporte__titulo {
+  font-size: var(--t-m);
+  font-weight: 800;
+  margin: 0;
+}
+
+.tarjeta-reporte__descripcion {
+  margin: 0;
+  color: var(--texto-suave);
+  flex-grow: 1;
+}
+
+.tarjeta-reporte__lugar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.9rem;
+}
+
+.tarjeta-reporte__barrio {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: var(--t-chico);
+  color: var(--texto-suave);
+}
+
+/* Cartel de calle */
+.cartel-calle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.15rem 0.6rem;
+  font-size: var(--t-chico);
+  font-weight: 700;
+  color: #FFFFFF;
+  background-color: var(--azul);
+  border: 2px solid #FFFFFF;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1.5px var(--azul);
+}
+
+/* Etiqueta de estado */
+.badge-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: var(--t-chico);
+  font-weight: 700;
+}
+
+.badge-estado::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.badge-estado--rojo  { color: #B8322A; }
+.badge-estado--ambar { color: #9A6700; }
+.badge-estado--verde { color: #22794F; }
+.badge-estado--rojo::before  { background-color: var(--rojo); }
+.badge-estado--ambar::before { background-color: var(--ambar); }
+.badge-estado--verde::before { background-color: var(--verde); }
+
+/* Seguimiento: 3 tramos, se pintan los alcanzados */
+.seguimiento {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  list-style: none;
+  margin: 0.25rem 0 0;
+  padding: 0;
+}
+
+.seguimiento__etapa {
+  padding-top: 0.45rem;
+  border-top: 5px solid var(--linea);
+  font-size: 0.75rem;
+  color: var(--texto-suave);
+}
+
+.seguimiento--rojo .seguimiento__etapa--hecha  { border-color: var(--rojo); }
+.seguimiento--ambar .seguimiento__etapa--hecha { border-color: var(--ambar); }
+.seguimiento--verde .seguimiento__etapa--hecha { border-color: var(--verde); }
+
+.seguimiento__etapa--hecha {
+  font-weight: 700;
+  color: var(--texto);
+}
+
+
+/* ===== 11. ESTADÍSTICAS ===== */
+.seccion--asfalto {
+  border-top: 6px solid transparent;
+  border-image: repeating-linear-gradient(90deg, var(--amarillo) 0 40px, transparent 40px 64px) 6;
+}
+
+.total {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.total__numero {
+  font-size: clamp(4rem, 9vw, 6.5rem);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: var(--amarillo);
+}
+
+.total__texto {
+  font-size: var(--t-m);
+  color: #B7C0CC;
+}
+
+/* Barra apilada por estado: crece al aparecer */
+.barra-estados {
+  display: flex;
+  height: 22px;
+  overflow: hidden;
+  border-radius: var(--radio-senal);
+  background-color: var(--asfalto-claro);
+}
+
+.barra-estados__tramo {
+  width: 0;
+  transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.estadisticas--visible .barra-estados__tramo {
+  width: var(--ancho);
+}
+
+.barra-estados__tramo--rojo  { background-color: var(--rojo); }
+.barra-estados__tramo--ambar { background-color: var(--ambar); transition-delay: 0.15s; }
+.barra-estados__tramo--verde { background-color: var(--verde); transition-delay: 0.3s; }
+
+.estados-lista,
+.categorias-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.estados-lista {
+  margin-top: 1.25rem;
+}
+
+.estados-lista__item {
+  display: grid;
+  grid-template-columns: 1fr auto 3.5rem;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--asfalto-claro);
+}
+
+.estados-lista__item span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.estados-lista__item span:first-child::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.estados-lista__item--rojo span:first-child::before  { background-color: var(--rojo); }
+.estados-lista__item--ambar span:first-child::before { background-color: var(--ambar); }
+.estados-lista__item--verde span:first-child::before { background-color: var(--verde); }
+
+.estados-lista__item strong {
+  font-size: var(--t-m);
+}
+
+.estados-lista__porcentaje {
+  text-align: right;
+  color: #B7C0CC;
+}
+
+.estadisticas__subtitulo {
+  font-size: var(--t-m);
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 1rem;
+}
+
+.categorias-lista__item {
+  display: grid;
+  grid-template-columns: 10rem 1fr 2rem;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 0;
+}
+
+.categorias-lista__nombre {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.categorias-lista__nombre .bi {
+  color: var(--amarillo);
+}
+
+.categorias-lista__barra {
+  height: 10px;
+  border-radius: 5px;
+  background-color: var(--asfalto-claro);
+  overflow: hidden;
+}
+
+.categorias-lista__barra span {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 5px;
+  background-color: var(--naranja);
+  transition: width 1s 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.estadisticas--visible .categorias-lista__barra span {
+  width: var(--ancho);
+}
+
+.categorias-lista__cantidad {
+  text-align: right;
+}
+
+
+/* ===== 12. FORMULARIO Y VISTA PREVIA ===== */
+.formulario {
+  padding: 2rem;
+  border-radius: var(--radio-tarjeta);
+  background-color: #FFFFFF;
+  border: 1px solid var(--linea);
+}
+
+.contador {
+  font-size: var(--t-chico);
+  color: var(--texto-suave);
+}
+
+.aviso {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.vista-previa {
+  position: sticky;
+  top: 96px;
+}
+
+.vista-previa__titulo {
+  font-weight: 700;
+  color: var(--texto-suave);
+  margin-bottom: 0.75rem;
+}
+
+.tarjeta-reporte--previa {
+  border-style: dashed;
+  border-width: 2px;
+}
+
+
+/* ===== 13. PIE DE PÁGINA ===== */
+.pie {
+  padding: 3rem 0 2rem;
+  color: #B7C0CC;
+  background-color: var(--azul);
+  border-top: 6px solid transparent;
+  border-image: repeating-linear-gradient(90deg, var(--amarillo) 0 40px, transparent 40px 64px) 6;
+}
+
+.pie__contenido {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 1.5rem 2rem;
+}
+
+.pie__marca {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.pie__nombre {
+  margin: 0;
+  font-weight: 900;
+  font-size: var(--t-m);
+  color: #FFFFFF;
+}
+
+.pie__texto {
+  margin: 0;
+}
+
+.pie__enlaces {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem 1.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pie__enlaces a {
+  color: #FFFFFF;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.pie__enlaces a:hover {
+  color: var(--amarillo);
+}
+
+.pie__credito {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding-top: 1.5rem;
+  font-size: var(--t-chico);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+
+/* ===== 14. RESPONSIVE ===== */
+
+/* Computadoras grandes: aparece la calle lateral */
+@media (min-width: 1280px) {
+  .recorrido {
+    display: block;
+  }
+
+  .progreso {
+    display: none;
+  }
+}
+
+/* Tablet y celular */
+@media (max-width: 1199.98px) {
+  .categorias {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 991.98px) {
+  .barra__boton {
+    margin: 0.5rem 0 0.25rem;
+  }
+
+  .seccion {
+    padding: 4rem 0;
+  }
+
+  .vista-previa {
+    position: static;
+  }
+
+  .categorias-lista__item {
+    grid-template-columns: 8.5rem 1fr 2rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .hero {
+    padding-top: 3rem;
+  }
+
+  /* Los pasos pasan a ser verticales, con la calle a la izquierda */
+  .pasos {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+
+  .pasos::before {
+    top: 22px;
+    bottom: 22px;
+    left: 22px;
+    right: auto;
+    width: 14px;
+    height: auto;
+    background-image: repeating-linear-gradient(180deg, var(--amarillo) 0 16px, transparent 16px 30px);
+    background-size: 2px 100%;
+  }
+
+  .paso {
+    display: grid;
+    grid-template-columns: 58px 1fr;
+    gap: 1rem;
+  }
+
+  .paso__parada {
+    margin: 0;
+  }
+
+  .categorias {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .formulario {
+    padding: 1.25rem;
+  }
+
+  .pie__contenido {
+    grid-template-columns: 1fr;
+  }
+
+  .pie__enlaces {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 479.98px) {
+  .categorias {
+    gap: 0.75rem;
+  }
+
+  .categoria__texto {
+    padding: 0.75rem 0.8rem 0.9rem;
+  }
+
+  .categoria__nombre {
+    font-size: var(--t-base);
+  }
+
+  .mapa__calle {
+    font-size: 0.6rem;
+  }
+
+  .pin__cabeza {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+
+/* ===== 15. MOVIMIENTO REDUCIDO =====
+   Si la persona pidió menos animaciones en su sistema, las quitamos. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  .barra-estados__tramo,
+  .categorias-lista__barra span {
+    width: var(--ancho);
+  }
+}
