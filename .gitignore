@@ -1,0 +1,12 @@
+# Dependencias (se instalan con npm install)
+node_modules
+
+# Versión de producción (se genera con npm run build)
+dist
+
+# Archivos del sistema y del editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+*.log
