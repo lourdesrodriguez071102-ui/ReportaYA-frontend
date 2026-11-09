@@ -8,6 +8,7 @@ import TarjetaReporte from "../components/reportes/TarjetaReporte";
 import { CATEGORIAS, BARRIOS, CALLES_MAPA } from "../data/reportes";
 import { fechaDeHoy } from "../utils/formato";
 import { leerGuardado, guardar, borrarGuardado } from "../utils/almacenamiento";
+import { confirmarDescartarBorrador, avisoExito } from "../utils/alertas";
 
 const FORMULARIO_VACIO = { titulo: "", categoria: "", barrio: "", direccion: "", descripcion: "" };
 const CLAVE_BORRADOR = "reportaya-borrador";
@@ -57,6 +58,16 @@ function NuevoReporte({ alCrear }) {
 
   function actualizarCampo(nombre, valor) {
     setDatos({ ...datos, [nombre]: valor });
+  }
+
+  // Pregunta con SweetAlert2 antes de borrar lo escrito
+  async function descartarBorrador() {
+    const confirmado = await confirmarDescartarBorrador();
+    if (!confirmado) return;
+
+    setDatos(FORMULARIO_VACIO);
+    setValidado(false);
+    avisoExito("Borrador descartado");
   }
 
   function manejarEnvio(evento) {
@@ -196,10 +207,7 @@ function NuevoReporte({ alCrear }) {
                       variant="link"
                       size="sm"
                       className="text-secondary p-0"
-                      onClick={() => {
-                        setDatos(FORMULARIO_VACIO);
-                        setValidado(false);
-                      }}
+                      onClick={descartarBorrador}
                     >
                       Descartar borrador
                     </Button>
